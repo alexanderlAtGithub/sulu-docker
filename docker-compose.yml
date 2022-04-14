@@ -1,25 +1,48 @@
-version: '3'
+version: '3.8'
 
 services:
-
   php:
+    env_file:
+      - .env
     build:
       context: docker/php
-    user: ${PHP_USER_ID}
+      target: master_php
     ports:
-      - ${PORT_PHP}:80
+      - ${PORT_PHP}:${PORT_PHP}
     volumes:
-      # Use :cached flag to speed up cache: https://github.com/docker/for-mac/issues/1592
-      - ${PROJECT_PATH}:/var/www/html:cached
+      - .${PROJECT_PATH}:${SERVICE_PATH}
+      - .${PROJECT_PATH_PUBLIC}:${SERVICE_PATH_PUBLIC}:cached
+      - ./docker/php/apache.conf:/etc/apache2/sites-enabled/000-default.conf
+    user: "www-data"
+    working_dir: ${SERVICE_PATH}
     networks:
       default:
         aliases:
           - ${PROJECT_DOMAIN}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       PROJECT_DOMAIN: ${PROJECT_DOMAIN}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    command: php -S 0.0.0.0:80 -t ${SERVICE_PATH_PUBLIC}  ##cat /blub
+
+  composer:
+    ###image: "composer:2.3.4"
+    #image: "composer"
+    build:
+      context: docker/php
+      target: composer_php
+    container_name: composer
+    depends_on:
+      - php
+    working_dir: ${SERVICE_PATH}
+    volumes:
+      - ".${PROJECT_PATH}:${SERVICE_PATH}"
+    environment:
+      - COMPOSER_CACHE_DIR=/app/var/cache/composer
+    command: composer u
 
   mysql:
     image: mysql:8.0.19
@@ -27,7 +50,7 @@ services:
     ports:
       - ${PORT_MYSQL}:3306
     volumes:
-      - ./data/mysql:/var/lib/mysql
+      - ${LOCAL_SINK}/mysql:/var/lib/mysql
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -39,7 +62,7 @@ services:
     ports:
       - ${PORT_ELASTICSEARCH}:9200
     volumes:
-      - ./data/elasticsearch:/usr/share/elasticsearch/data
+      - ${LOCAL_SINK}/elasticsearch:/usr/share/elasticsearch/data
     environment:
       discovery.type: single-node
       xpack.security.enabled: 'false'
