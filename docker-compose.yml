@@ -26,7 +26,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    command: php -S 0.0.0.0:80 -t ${SERVICE_PATH_PUBLIC}  ##cat /blub
+    command: php -S 0.0.0.0:80 -t ${SERVICE_PATH_PUBLIC}
 
   composer:
     build:
