@@ -29,8 +29,6 @@ services:
     command: php -S 0.0.0.0:80 -t ${SERVICE_PATH_PUBLIC}  ##cat /blub
 
   composer:
-    ###image: "composer:2.3.4"
-    #image: "composer"
     build:
       context: docker/php
       target: composer_php

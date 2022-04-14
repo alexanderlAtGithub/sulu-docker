@@ -31,9 +31,7 @@ COPY ./apache.conf "$APACHE_CONFDIR/sites-enabled/000-default.conf"
 
 
 FROM master_php AS composer_php
-#
-## Install composer and set COMPOSER_HOME to writable directory
+
 RUN cd /tmp
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
-###RUN cd /tmp && curl -sS https://getcomposer.org/installer && php composer-setup.php --install-dir=/usr/local/bin/ --filename=composer
 ENV COMPOSER_HOME /tmp/.composer
