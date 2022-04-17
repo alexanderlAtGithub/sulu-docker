@@ -6,7 +6,7 @@ services:
       - .env
     build:
       context: docker/php
-      target: master_php
+      target: ${CONTAINER_TARGET}
     ports:
       - ${PORT_PHP}:${PORT_PHP}
     volumes:
@@ -28,6 +28,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     command: php -S 0.0.0.0:80 -t ${SERVICE_PATH_PUBLIC}
 
+# composer service to do composer things
   composer:
     build:
       context: docker/php
@@ -40,7 +41,18 @@ services:
       - ".${PROJECT_PATH}:${SERVICE_PATH}"
     environment:
       - COMPOSER_CACHE_DIR=/app/var/cache/composer
-    command: composer u
+    command: ps #composer u
+
+### service only for creating a sulu project from scratch (version: latest)
+  create-composer-project:
+    build:
+      context: docker/php
+      target: composer_php
+    container_name: creates-sulu-from-scratch
+    working_dir: ${SERVICE_PATH}
+    volumes:
+      - ./:${SERVICE_PATH}
+    command: ps
 
   mysql:
     image: mysql:8.0.19
