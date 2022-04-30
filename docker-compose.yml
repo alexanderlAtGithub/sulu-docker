@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.5'
 
 services:
   php:
@@ -32,7 +32,7 @@ services:
   composer:
     build:
       context: docker/php
-      target: composer_php
+      target: composer_with_gd
     container_name: composer
     depends_on:
       - php
@@ -43,18 +43,7 @@ services:
       - COMPOSER_CACHE_DIR=/app/var/cache/composer
     command: ps #composer u
 
-### service only for creating a sulu project from scratch (version: latest)
-  create-composer-project:
-    build:
-      context: docker/php
-      target: composer_php
-    container_name: creates-sulu-from-scratch
-    working_dir: ${SERVICE_PATH}
-    volumes:
-      - ./:${SERVICE_PATH}
-    command: ps
-
-  mysql:
+  datasink:
     image: mysql:8.0.19
     command: --default-authentication-plugin=mysql_native_password
     ports:
