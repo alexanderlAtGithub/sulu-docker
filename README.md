@@ -15,7 +15,6 @@
 
 * Sulu-Website: `PROJECT_DOMAIN:PORT_NGINX` (default: `sulu.localhost`)
 * Sulu-Admin: `PROJECT_DOMAIN:PORT_NGINX/admin` (default: `sulu.localhost/admin`)
-* MySQL: `PROJECT_DOMAIN:PORT_MYSQL` (default: `sulu.localhost:3306`)
 * Elasticsearch: `PROJECT_DOMAIN:PORT_ELASTICSEARCH` (default: `sulu.localhost:9200`)
 
 ## Install Environment
@@ -24,32 +23,20 @@
 git clone https://github.com/alexanderlAtGithub/sulu-docker.git && cd sulu-docker
 ```
 
-Important, 
-IF you have an Sulu (Git-Repository) project, clone it into the directory "sulu"
+## Important I 
+IF you have an Sulu 2 (Git-Repository) project, clone it into the directory "sulu" (or configure .env/PROJECT_PATH & PROJECT_PATH_PUBLIC variable to fit your needs)
 
-IF not, create your sulu project with "docker" composer like
+## Important II
+IF you haven't any Sulu 2 project now, create your sulu project with "docker-composer" like
 ```bash
-docker run --rm --interactive --tty --volume $PWD:/app composer create-project sulu/skeleton sulu --ignore-platform-reqs
+docker-compose run installsulu 
 ```
-something on Sulu side check s the gd lib, in the end you got an error that Gd driver is not installed (which was right, the offical (docker) composer doesnt have the gd)
-
-But now, do 
+after this, you have to manually move files from "installed_sulu" to "PROJECT_PATH"
 ```bash
-docker-compose build --build-arg HAS_XDEBUG=true
+$ cd sulu && mv {installed_sulu/*,installed_sulu/.*} . 
 ```
-if you want Xdebug for work !
+("installed_sulu/" see ${INSTALL_SULU} in .env) and read the "Create Sulu Project" part (below)
 
-If not or after build do 
-
-```bash
-docker-compose up -d
-```
-then you have to wait for composer to do his job twice (now without the error for Gd driver is not installed)
-If composer has done his job, call in the browser http://sulu.localhost/?XDEBUG_SESSION (if php container has an xdebug, you debug)
-
-
-The `.env` file contains several environment variables that are used to throughout the environment. 
-This allows to configure the project path, database settings, public ports of the services and the domain name.
 
 ## Startup Containers
 
@@ -57,11 +44,17 @@ This allows to configure the project path, database settings, public ports of th
 docker-compose up -d
 ```
 
-You can also startup the containers in the background by executing:
+## Stop Containers
 
 ```bash
-docker-compose start
+docker-compose down --remove-orphans
 ```
+
+## Important III
+There are two PHP Container, first one with Port 80 (http://sulu.localhost) and with Port 8080 (http://sulu.localhost:8080) for debugging (XDebug). Configure your IDE with debugging with service "xdebug".
+
+## Important IV 
+be aware of comments in docker-composer.yml, some services are not for production 
 
 ## Create Sulu Project
 
@@ -75,14 +68,6 @@ echo "ELASTICSEARCH_HOST=elasticsearch:9200" >> .env.local
 bin/adminconsole sulu:build dev --destroy
 ```
 
-After completing these steps the services are accessible via the URLs listed above. If not, do a restart of docker-services. 
-
-## Update Container Configuration
-
-When changing configuration inside of the `docker` folder, the environment must be rebuilt and restarted:
-
-```bash
-docker-compose down
-docker-compose build
-docker-compose up
-```
+## And
+software quality as is ..
+and if question, asked
