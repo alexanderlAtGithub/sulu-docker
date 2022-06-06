@@ -34,10 +34,3 @@ FROM composer:latest AS composer_with_gd
 RUN apk add --no-cache freetype-dev libjpeg-turbo-dev libpng-dev libzip-dev zlib-dev
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg
 RUN docker-php-ext-install gd
-
-
-#FROM apache_php AS composer_php
-#
-#RUN cd /tmp
-#RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
-#ENV COMPOSER_HOME /tmp/.composer

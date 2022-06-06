@@ -13,7 +13,6 @@ services:
       - .${PROJECT_PATH}:${SERVICE_PATH}
       - .${PROJECT_PATH_PUBLIC}:${SERVICE_PATH_PUBLIC}:cached
       - ./docker/php/apache.conf:/etc/apache2/sites-enabled/000-default.conf
-    user: "www-data"
     working_dir: ${SERVICE_PATH}
     networks:
       default:
@@ -26,46 +25,6 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_APP_DRIVER: ${DATABASE_APP_DRIVER}
     command: php -S 0.0.0.0:80 -t ${SERVICE_PATH_PUBLIC}
-
-### not for production
-  xdebug:
-    build:
-      context: docker/php
-      target: xdebug_apache_php
-    ports:
-      - 8080:8181
-    working_dir: ${SERVICE_PATH}
-    volumes:
-      - ".${PROJECT_PATH}:${SERVICE_PATH}"
-    environment:
-      PROJECT_DOMAIN: ${PROJECT_DOMAIN}
-      DATABASE_DB: ${DATABASE_DB}
-      DATABASE_USER: ${DATABASE_USER}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-    command: php -S 0.0.0.0:8181 -t ${SERVICE_PATH_PUBLIC}
-
-  composer:
-    build:
-      context: docker/php
-      target: composer_with_gd
-    depends_on:
-      - php
-    working_dir: ${SERVICE_PATH}
-    volumes:
-      - ".${PROJECT_PATH}:${SERVICE_PATH}"
-    environment:
-      - COMPOSER_CACHE_DIR=/app/var/cache/composer
-    command: composer u
-
-### not for production
-  installsulu:
-    build:
-      context: docker/php
-      target: composer_with_gd
-    working_dir: ${SERVICE_PATH}
-    volumes:
-      - ".${PROJECT_PATH}:${SERVICE_PATH}"
-    command: composer create-project sulu/skeleton ${INSTALL_SULU}
 
   datasink:
     image: postgres:14.2-bullseye
@@ -88,6 +47,46 @@ services:
     environment:
       discovery.type: single-node
       xpack.security.enabled: 'false'
+
+  composer:
+    build:
+      context: docker/php
+      target: composer_with_gd
+    depends_on:
+      - php
+    working_dir: ${SERVICE_PATH}
+    volumes:
+      - ".${PROJECT_PATH}:${SERVICE_PATH}"
+    environment:
+      - COMPOSER_CACHE_DIR=/app/var/cache/composer
+    command: composer u
+
+### think, before using in production
+  xdebug:
+    build:
+      context: docker/php
+      target: xdebug_apache_php
+    ports:
+      - 8080:8181
+    working_dir: ${SERVICE_PATH}
+    volumes:
+      - ".${PROJECT_PATH}:${SERVICE_PATH}"
+    environment:
+      PROJECT_DOMAIN: ${PROJECT_DOMAIN}
+      DATABASE_DB: ${DATABASE_DB}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+    command: php -S 0.0.0.0:8181 -t ${SERVICE_PATH_PUBLIC}
+
+  ### think, before using in production
+#  installsulu:
+#    build:
+#      context: docker/php
+#      target: composer_with_gd
+#    working_dir: ${SERVICE_PATH}
+#    volumes:
+#      - ".${PROJECT_PATH}:${SERVICE_PATH}"
+#    command: composer create-project sulu/skeleton ${INSTALL_SULU}
 
 volumes:
   datasink_pg:

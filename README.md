@@ -17,6 +17,10 @@
 * Sulu-Admin: `PROJECT_DOMAIN:PORT_NGINX/admin` (default: `sulu.localhost/admin`)
 * Elasticsearch: `PROJECT_DOMAIN:PORT_ELASTICSEARCH` (default: `sulu.localhost:9200`)
 
+# About this Fork
+
+its for education, its not the holy truth ...
+
 ## Install Environment
 
 ```bash
@@ -24,19 +28,8 @@ git clone https://github.com/alexanderlAtGithub/sulu-docker.git && cd sulu-docke
 ```
 
 ## Important I 
-IF you have an Sulu 2 (Git-Repository) project, clone it into the directory "sulu" (or configure .env/PROJECT_PATH & PROJECT_PATH_PUBLIC variable to fit your needs)
-
-## Important II
-IF you haven't any Sulu 2 project now, create your sulu project with "docker-composer" like
-```bash
-docker-compose run installsulu 
-```
-after this, you have to manually move files from "installed_sulu" to "PROJECT_PATH"
-```bash
-$ cd sulu && mv {installed_sulu/*,installed_sulu/.*} . 
-```
-("installed_sulu/" see ${INSTALL_SULU} in .env) and read the "Create Sulu Project" part (below)
-
+IF you have an Sulu 2 (Git-Repository) project, clone it into the directory "sulu" 
+(or configure .env "PROJECT_PATH" & "PROJECT_PATH_PUBLIC" variable to fit your needs, add the new directory name in .gitignore too)
 
 ## Startup Containers
 
@@ -50,15 +43,28 @@ docker-compose up -d
 docker-compose down --remove-orphans
 ```
 
-## Important III
+## Important II
 There are two PHP Container, first one with Port 80 (http://sulu.localhost) and with Port 8080 (http://sulu.localhost:8080) for debugging (XDebug). Configure your IDE with debugging with service "xdebug".
 
-## Important IV 
+## Important III 
 be aware of comments in docker-composer.yml, some services are not for production 
 
-## Create Sulu Project
+## Create your Sulu Project
 
-(in docker-service container php)
+IF you haven't any Sulu 2 project now, create your sulu project with "docker-composer" like
+```bash
+docker-compose run installsulu 
+```
+do uncomment the service "installsulu", reset any changes to environment variables, and then do docker-composer run installsulu
+after this, you have to manually move files from "mysulu" to "PROJECT_PATH"
+```bash
+$ cd sulu && mv {mysulu/*,mysulu/.*} . 
+```
+("mysulu/" see ${INSTALL_SULU} in .env) 
+
+
+(change into docker-service container php)
+and here do 
 ```bash
 # Set service urls to the `.env.local` file
 echo "DATABASE_URL=mysql://$MYSQL_USER:$MYSQL_PASSWORD@mysql:3306/$MYSQL_DATABASE" >> .env.local
